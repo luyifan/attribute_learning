@@ -24,6 +24,10 @@ class image_classifier:
     default_args['raw_scale']=255
     default_args['gpu_mode']= True
     default_args['context_pad']=16
+    default_args['cluster_num']=10
+    default_args['top_k']=20
+    default_args['max_ratio']=4
+    default_args['min_size']=100
     def __init__(self,model_def_file=default_args['model_def_file'],
             pretrained_model_file=default_args['pretrained_model_file'],
             mean_file=default_args['mean_file'],
@@ -31,13 +35,18 @@ class image_classifier:
             image_dim=default_args['image_dim'],
             gpu_mode=default_args['gpu_mode'],
             bing_model_file=default_args['bing_model_file'],
-            context_pad=default_args['context_pad']):
+            context_pad=default_args['context_pad'],
+            cluster_num=default_args['cluster_num'],
+            top_k=default_args['top_k'],
+            max_ratio=default_args['max_ratio'],
+            min_size=default_args['min_size']
+            ):
         logging.info('Loading net and associated files...')
         self.net = caffe.Classifier(
                 model_def_file,pretrained_model_file,
                 image_dims=(image_dim,image_dim),raw_scale=raw_scale,
                 mean=np.load(mean_file),channel_swap=(2,1,0),gpu=gpu_mode)
-        self.bing = bing_cluster()
+        self.bing = bing_cluster(cluster_num,top_k,max_ratio,min_size)
         self.configure_crop(context_pad)
         self.bing.load_bing_model(bing_model_file)
     def get_cnn_feature_of_image(self,image_filename):
@@ -64,10 +73,10 @@ class image_classifier:
             caffe_in[index] = self.net.preprocess(self.net.inputs[0],window_in)
         out = self.net.forward_all(blobs=['fc7'], **{self.net.inputs[0]: caffe_in})
         fc7_feature = out['fc7'].squeeze(axis=(2,3))
-        print fc7_feature
+        print fc7_feature.shape
         endtime = time.time()
         logging.info("One image bing cnn feature spend {:.3f}".format(endtime-starttime))
-        return 
+        return fc7_feature 
     def crop(self,im,row):
         """
         Crop a window from the image for detection. Include surrounding context 

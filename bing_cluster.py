@@ -77,8 +77,17 @@ class bing_cluster:
                 continue
             index_dictionary[label].append(i)
         index_list = []
-        for key in index_dictionary:
-            index_list.extend(index_dictionary[key])
+        #for key in index_dictionary:
+        #    index_list.extend(index_dictionary[key])
+        while True:
+            empty=True
+            for key in index_dictionary:
+                one_list = index_dictionary[key]
+                if len(one_list):
+                    empty=False
+                    index_list.append(one_list.pop(0))
+            if empty:
+                break
         bing_windows = pd.DataFrame({"ymin":y1[index_list],"xmin":x1[index_list],"ymax":y2[index_list],"xmax":x2[index_list]})
         endtime=time.time()
         logging.info("Cluster spend {:.3f}".format(endtime-starttime))
