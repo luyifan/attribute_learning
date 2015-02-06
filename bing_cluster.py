@@ -9,6 +9,7 @@ from sklearn import cluster
 
 PROJECT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
 MODEL_DIRNAME = os.path.join(PROJECT_DIRNAME,"models/bing")
+DEFAULT_MODEL_FILE = os.path.join(MODEL_DIRNAME,"ObjNessB2W8MAXBGR")
 logging.getLogger().setLevel(logging.INFO)
 class bing_cluster:
     def __init__(self,cluster_num=10,top_k=10,max_ratio=4,min_size=100):
@@ -18,9 +19,10 @@ class bing_cluster:
         self.max_ratio = max_ratio
         self.min_size = min_size
         self.spectral = cluster.SpectralClustering(n_clusters=self.cluster_num,affinity='precomputed') 
-    def load_bing_model(self):
+    def load_bing_model(self,model_file=DEFAULT_MODEL_FILE):
+        logging.info("Load Bing Model ...")
         self.bing = Bing(2,8,2)
-        self.bing.loadTrainModel(os.path.join(MODEL_DIRNAME,"ObjNessB2W8MAXBGR"))
+        self.bing.loadTrainModel(model_file)
     def get_bing_of_image(self,image_filename,numPerSz=130):
         boxes = self.bing.getBoxesOfOneImage(image_filename,numPerSz)
         ymins = [ s for s in boxes.ymins() ]
