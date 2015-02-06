@@ -73,7 +73,7 @@ class image_classifier:
             caffe_in[index] = self.net.preprocess(self.net.inputs[0],window_in)
         out = self.net.forward_all(blobs=['fc7'], **{self.net.inputs[0]: caffe_in})
         fc7_feature = out['fc7'].squeeze(axis=(2,3))
-        print fc7_feature.shape
+        #print fc7_feature.shape
         endtime = time.time()
         logging.info("One image bing cnn feature spend {:.3f}".format(endtime-starttime))
         return fc7_feature 

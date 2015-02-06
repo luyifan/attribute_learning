@@ -90,5 +90,5 @@ class bing_cluster:
                 break
         bing_windows = pd.DataFrame({"ymin":y1[index_list],"xmin":x1[index_list],"ymax":y2[index_list],"xmax":x2[index_list]})
         endtime=time.time()
-        logging.info("Cluster spend {:.3f}".format(endtime-starttime))
+        #logging.info("Cluster spend {:.3f}".format(endtime-starttime))
         return bing_windows
